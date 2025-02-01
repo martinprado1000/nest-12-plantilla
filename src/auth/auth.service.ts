@@ -1,0 +1,92 @@
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt'; // Importamos jwt
+
+import * as bcrypt from 'bcrypt';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { plainToInstance } from 'class-transformer';
+
+import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { LoginUserDto } from './dto/login-user.dto';
+//import { User } from './schemas/user.schema';
+import { User } from '../users/schemas/user.schema';
+import { UsersService } from '../users/users.service';
+import { CreateUserDto, ResponseUserDto } from '../users/dto';
+import { response } from 'express';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private readonly userService: UsersService,
+    @InjectModel(User.name) private userModel: Model<User>,
+    private readonly jwtService: JwtService, // Este es el modulo de jwt que interactua con el jwtModulo creado por nosotros
+  ) {}
+
+  async create(createAuthDto: CreateUserDto) {
+    // Uso el CreateUserDto para crear un createAuthDto porque cuando creamos el usuario ya creamos la autenticación.
+
+    const userResponse = await this.userService.create(createAuthDto);
+
+    return {
+      ...userResponse,
+      token: this.getJwtToken({ id: userResponse.id }),
+    };
+  }
+
+  async login(loginAuthDto: LoginUserDto) {
+    let userResponse: ResponseUserDto 
+    const { password, email } = loginAuthDto;
+
+    const user = await this.userService.findOne(email);
+    // if (!user)
+    //   throw new UnauthorizedException('Credential are not valid (email)');
+
+    if (!bcrypt.compareSync(password, user.password))
+      throw new UnauthorizedException('Credential are not valid (password)');
+    //delete user.password
+
+    userResponse = plainToInstance(ResponseUserDto,user,{
+      // Paso por el metodo ResponseUserDto para retornar el objeto editado, se lo paso como objeto plano de javaScript
+      excludeExtraneousValues: true, // Excluye propiedades NO marcadas con @Expose en el response-user.dto
+    },); 
+
+    // Si la registración fue correcta retornamos el usuario y el token.
+    if (user._id){ // Aunque ya se que el id existe hago la validacion para que pase la validación del tipo de dato.
+      return {
+        ...userResponse,
+        token: this.getJwtToken({ id: user._id }),
+      };
+    }
+  }
+
+  // Este metodo es para revalidarle el jwt en el caso que este validado pero pierda en token en un refresco de pantalla.
+  async checkAuthStatus(user: User) {
+    return {
+      ...user,
+      token: this.getJwtToken({ id: user.id }),
+    };
+  }
+
+  // Este es nuestro metodo que genera el token
+  private getJwtToken(payload: JwtPayload) {
+    const token = this.jwtService.sign(payload);
+    return token;
+  }
+
+  private handleDBErrors(error: any): never {
+    // Esta funcion retorna never porque nunca va a retornar nada. Solo puede lanzar una axection.
+    console.log(error);
+    if (error.code === 11000)
+      throw new BadRequestException(
+        `El usuario ${JSON.stringify(error.keyValue.email)} ya existe`,
+      );
+
+    console.log(error);
+    throw new InternalServerErrorException('Please check server logs');
+  }
+}
