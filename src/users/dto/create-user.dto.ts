@@ -46,6 +46,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MinLength(6)
   //@Matches(/^[^\s]+$/, { message: 'The password must not contain spaces' })
+  @Matches(/^\S*$/, { message: 'La contraseña no debe contener espacios' })
   @Matches(/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
     message:
       'La contraseña debe tener una letra mayúscula, minúscula y un número.',
@@ -56,6 +57,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MinLength(6)
   //@Matches(/^[^\s]+$/, { message: 'The confirm password must not contain spaces' }) // Esta permite 123456
+  @Matches(/^\S*$/, { message: 'La confirmación de contraseña no debe contener espacios' })
   @Matches(/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
     message:
       'La confirmación de contraseña debe tener una letra mayúscula, minúscula y un número.',

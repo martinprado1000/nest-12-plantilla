@@ -9,7 +9,10 @@ export const envSchema = Joi.object({
   NODE_ENV: Joi.string().default('dev'),
   JWT_SECRET: Joi.string().required(),
   DATABASE_URI: Joi.string().required(),
+  DATABASE_PORT: Joi.string(),
+  DATABASE_NAME: Joi.string(),
   DATABASE_USERNAME: Joi.string().allow('', null),
   DATABASE_PASSWORD: Joi.string().allow('', null),
-  PAGINATIONS_DEFAULT_LIMIT: Joi.number().default(20) 
+  PAGINATIONS_DEFAULT_LIMIT: Joi.number().default(20), 
+  PASSWORD_SEED_USERS: Joi.string().required(),
 });

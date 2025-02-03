@@ -21,11 +21,11 @@ async function bootstrap() {
     }
   })); 
 
-    // Swagger
+  // Swagger
   // En la version nueva los tags se cargan automaticamente.
   const config = new DocumentBuilder()
-    .setTitle('Ecommerce RESTFul API')
-    .setDescription('Ecommerce endpoints')
+    .setTitle('Plantilla RESTFul API')
+    .setDescription('Users endpoints')
     .setVersion('1.0')
     //.addTag('Default') // Esto lo hace automatico en la nueva version, agrega el tag correspondiente al endpoint.
     .build();
@@ -36,7 +36,7 @@ async function bootstrap() {
   //console.log(configService)
   const PORT = configService.get('port')
   await app.listen(Number(PORT)); // El valor por defecto en el caso que no lo este en el .env lo obtiene del envSchema
-  logger.log(`App runing on port ${process.env.PORT}`)
+  logger.log(`App runing on port ${PORT}`)
 
 
 }

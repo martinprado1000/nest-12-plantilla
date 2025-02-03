@@ -29,14 +29,14 @@ export class UserRoleGuard implements CanActivate {
     const validRoles: string[] = this.reflector.get( META_ROLES, context.getHandler() ) // Obtenemos los roles.
     //console.log(validRoles)
 
-    // Las siguiente 2 validaciones es para que si no vienen los rolos cuando llamamos al guard es porque no lo necesita asique los dejamos pasar.
+    // Las siguiente 2 validaciones es para que si no vienen los rolos cuando llamamos al guard es porque no lo necesita asi que los dejamos pasar.
     if ( !validRoles ) return true;
     if ( validRoles.length === 0 ) return true;
     
-    const req = context.switchToHttp().getRequest();  // Obtenemos el usuario desde el contecto
+    const req = context.switchToHttp().getRequest();  // Obtenemos el usuario completo desde el contexto. El usuario fue agregado automaticamente al contexto por el AuthGuard() de passport.
     //const user: User = req.user;
-    const user = req.user as User;  // Esto es lo parecido a la anterior pero asi lo hace sin instentar inferir el dato que que podemos no tener el valor en req.user.
-console.log(user)
+    const user = req.user as User;  // Esta linea es parecida a la anterior pero asi lo hace sin inferir el dato que podemos no tener el valor en req.user.
+    
     if ( !user ) 
       throw new BadRequestException('User not found (request)');   // Si obtenemos este error es porque tenemos un error en el backend porque llego hasta aqui sin autorizar un token.
     
@@ -45,7 +45,7 @@ console.log(user)
 
     for (const role of user.roles ) {
       if ( validRoles.includes( role ) ) {
-        return true;
+        return true; // Aca retornamos true porque el rol hace match con alguno de los roles pasados.
       }
     }
     

@@ -17,14 +17,16 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ResponseUserDto } from './dto/response-user.dto';
 import { ConfigService } from '@nestjs/config';
 import { PaginationDto } from '../common/dtos/pagination.dto';
+import { CustomLoggerService } from 'src/logger/logger.service';
 
 @Injectable()
 export class UsersService {
-  private readonly logger = new Logger('UsersService'); // Genera un logger para este servicio.
+  //private readonly logger = new Logger('UsersService'); // Genera un logger para este servicio.
   private defaultLimit: number;
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private readonly configService: ConfigService,
+    private readonly logger: CustomLoggerService,
   ) {
     this.defaultLimit = configService.get<number>('pagination.defaultLimit', 3); // Le pongo un limite default para poder tipar.
   }
@@ -176,11 +178,17 @@ export class UsersService {
   }
 
   // -----------DELETE-------------------------------------------------------------------------------
-  async remove(id: string) {
+  async remove(id: string, user: User) {
     let deletedUser: CreateUserDto | null;
 
     try {
       deletedUser = await this.userModel.findByIdAndDelete(id);
+      this.logger.http(`El usuario ${user.email} eliminó al usuario con id ${id}`, UsersService.name);
+      this.logger.error('This is an error', UsersService.name, "Error detail");
+      this.logger.warn('This is a warning', UsersService.name,);
+      this.logger.log('This is an info log', UsersService.name,);
+      this.logger.debug('This is a debug',  UsersService.name);
+      this.logger.verbose('This is a verbose',  UsersService.name);
     } catch (error) {
       this.handleDBErrors(error);
     }
@@ -189,6 +197,26 @@ export class UsersService {
 
     return `Usuario con id: ${id} eliminado`
   }
+
+    // -----------DELETE ALL USERS-------------------------------------------------------------------------------
+    // Elimina todos los uausuarios para poder eliminar el documento
+    async removeAllUsers() {
+      try {
+        await this.userModel.deleteMany();
+      } catch (error) {
+        this.handleDBErrors(error);
+      }
+    }
+
+    // -----------DELETE DATA BASE USERS-------------------------------------------------------------------------------
+    async deleteUsersCollection(): Promise<string> {
+      try {
+        await this.userModel.collection.drop();
+        return 'Colección de productos eliminada con éxito';
+      } catch (error) {
+        throw new Error('No se pudo eliminar la colección');
+      }
+    }
 
   // -----------GENERETE SEED USERS-------------------------------------------------------------------------------
   async genereteSeedUsers(createUserDto: CreateUserDto) {

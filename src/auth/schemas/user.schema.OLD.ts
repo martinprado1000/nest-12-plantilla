@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'; // SchemaFactory: crea el modelo del schema
 import { Document } from 'mongoose';
-import { Role } from '../enums/role.enums';
+//import { Role } from '../enums/role.enums';
 
 // Entity para base de datos mongoDB
 

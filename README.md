@@ -39,7 +39,7 @@ npm install
 $ npm run star:dev
 
 # Ejecutar seed de Usuarios,inserta multiples datos.
-http://localhost:3000/api/seed
+http://localhost:3000/api/seed/executeSeed
 ```
 
 
@@ -65,9 +65,17 @@ docker-compose -f docker-compose.prod.yaml --env-file .env.prod up --build
 # Si las imagenes ya fueron creadas y solo necesitamos levantar ejecutar:
 docker-compose -f docker-compose.prod.yaml --env-file .env.prod up -d
 ```
+##
+### OpenApi-Documentación Swagger:
+ 
+Endpoints, entities, dto.
+
+http://localhost:3000/api#
 
 #
-### ¿QUE HACE ESTA App?
+#
+¿QUE HACE ESTA App?
+
 Configuraciones:
 
 * Entidades: User, Auth, Logger

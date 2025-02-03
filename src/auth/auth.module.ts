@@ -4,7 +4,7 @@
 // npm install @nestjs/jwt passport-jwt
 // npm i -D @types/passport-jwt
 
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
@@ -26,9 +26,7 @@ import { UsersModule } from 'src/users/users.module';
 
     ConfigModule,
 
-    UsersModule,
-
-    //TypeOrmModule.forFeature([User]),
+    forwardRef(() => UsersModule), // forwardRef: Como el modulo Auth depende del de User tengo que importarlo con forwardRef para solucionar la dependencia circular
 
     PassportModule.register({ defaultStrategy: 'jwt' }),
 
@@ -53,6 +51,6 @@ import { UsersModule } from 'src/users/users.module';
 
   ],
 
-  exports: [ JwtStrategy, PassportModule, JwtModule, MongooseModule ], // Los exporto para el caso que necesite validar algo de jwt en otro lado.
+  exports: [ AuthService, JwtStrategy, PassportModule, JwtModule, MongooseModule ], // Los exporto para el caso que necesite validar algo de jwt en otro lado.
 })
 export class AuthModule {}

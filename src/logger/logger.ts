@@ -10,7 +10,7 @@ interface LogMeta {
 export const Logger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
-    winston.format.timestamp(),
+    winston.format.timestamp({ format: 'YYYY-MM-DD_HH:mm:ss' }),
     winston.format.printf(({ timestamp, level, message, meta }: { timestamp: string; level: string; message: string; meta?: LogMeta }) => {
       const correlationId = meta?.correlationId || 'N/A';
       return `${timestamp} [${level.toUpperCase()}] [CorrelationId: ${correlationId}] ${message}`;
@@ -20,6 +20,7 @@ export const Logger = winston.createLogger({
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
+        winston.format.timestamp({ format: 'YYYY-MM-DD_HH:mm:ss' }),
         winston.format.printf(({ timestamp, level, message, meta }: { timestamp: string; level: string; message: string; meta?: LogMeta }) => {
           const correlationId = meta?.correlationId || 'N/A';
           return `${timestamp} [${level.toUpperCase()}] [CorrelationId: ${correlationId}] ${message}`;
