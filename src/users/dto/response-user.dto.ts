@@ -1,7 +1,5 @@
-import { Exclude, Expose, Transform } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { Role } from '../enums/role.enums';
-import { IsOptional } from 'class-validator';
-
 export class ResponseUserDto {
 
   @Expose()

@@ -80,7 +80,7 @@ Configuraciones:
 
 * Entidades: User, Auth, Logger
 
-* Autenticacion y autorizacion. Recibe roles, un string o como arreglo: SUPERADMIN, ADMIN, OPERATOR, USER.
+* Autenticacion y autorizacion. Recibe roles, string o arreglo: SUPERADMIN, ADMIN, OPERATOR, USER.
 
 * .env  .env.template  .env.prod.
 

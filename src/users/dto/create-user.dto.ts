@@ -7,21 +7,36 @@ import {
   IsEnum,
   Matches,
   IsBoolean,
-  IsMongoId,
+  IsMongoId
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { Role } from '../enums/role.enums';
 import { Types } from 'mongoose';
-import { BadRequestException } from '@nestjs/common';
+import { ApiProperty } from '@nestjs/swagger';
+import { array, boolean, string } from 'joi';
 
 export class CreateUserDto {
-  @IsOptional() // 🔹 No siempre estará presente
-  @IsMongoId() // 🔹 Valida que sea un ID de Mongo
+
+  @ApiProperty({
+    description: 'Mongo Id (unique)',
+    type: string,
+    nullable: true, // True porque viene siempre nulo
+    example: "67a1a6c23504ec3e184cc14a",
+  })
+  @IsOptional()
+  @IsMongoId()
   @Transform(({ value }) =>
     Types.ObjectId.isValid(value) ? value.toString() : value,
-  ) // 🔹 Convierte a string si es un ObjectId, se hace para evitar problemas futuros.
+  ) // Convierte a string si es un ObjectId, se hace para evitar problemas futuros.
   _id?: string;
 
+  @ApiProperty({
+    description: 'User name',
+    type: string,
+    minLength: 2,
+    nullable: false, // no puede venir nulo
+    example: 'Richard'
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(2)
@@ -29,6 +44,13 @@ export class CreateUserDto {
   @Transform(({ value }) => capitalize(value))
   name: string;
 
+  @ApiProperty({
+    description: 'User lastname',
+    type: string,
+    minLength: 2,
+    nullable: false,
+    example: 'Kendy'
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(2)
@@ -36,12 +58,23 @@ export class CreateUserDto {
   @Transform(({ value }) => capitalize(value))
   lastname: string;
 
+  @ApiProperty({
+    description: 'User email',
+    type: string,
+    nullable: false,
+    example: 'richard@gmail.com'
+  })
   @IsEmail()
   @IsNotEmpty()
-  @MinLength(5)
   @Transform(({ value }) => value.toLowerCase().trim())
   email: string;
 
+  @ApiProperty({
+    description: 'User password',
+    type: string,
+    nullable: false,
+    example: 'Test123##'
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
@@ -53,17 +86,32 @@ export class CreateUserDto {
   })
   password: string;
 
+  @ApiProperty({
+    description: 'User confirm password',
+    type: string,
+    nullable: false,
+    example: 'Test123##'
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
   //@Matches(/^[^\s]+$/, { message: 'The confirm password must not contain spaces' }) // Esta permite 123456
-  @Matches(/^\S*$/, { message: 'La confirmación de contraseña no debe contener espacios' })
+  @Matches(/^\S*$/, {
+    message: 'La confirmación de contraseña no debe contener espacios',
+  })
   @Matches(/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
     message:
       'La confirmación de contraseña debe tener una letra mayúscula, minúscula y un número.',
   })
   confirmPassword: string;
 
+  @ApiProperty({
+    description: 'User role',
+    type: array,
+    enum: Role,
+    nullable: true,
+    example: 'USER'
+  })
   @IsOptional()
   @IsEnum(Role, { each: true })
   @Transform(({ value }) => {
@@ -78,6 +126,12 @@ export class CreateUserDto {
   })
   roles?: Role[] | Role;
 
+  @ApiProperty({
+    description: 'User is active?',
+    type: boolean,
+    nullable: true,
+    example: true
+  })
   @IsOptional()
   @IsBoolean()
   isActive: boolean;
