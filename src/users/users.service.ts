@@ -32,15 +32,16 @@ export class UsersService {
   }
 
   // -----------FIND ALL---------------------------------------------------------------------------------
-  async findAll(paginationDto: PaginationDto) {
+  async findAll(paginationDto: PaginationDto): Promise<User[]> {
     const { limit = this.defaultLimit, offset = 0 } = paginationDto;
     return await this.userModel
       .find()
       .skip(offset) // Salta los primeros `offset` registros
       .limit(limit);
   }
+
   // -----------FIND ALL RESPONSE-------------------------------------------------------------
-  async findAllResponse(paginationDto: PaginationDto) {
+  async findAllResponse(paginationDto: PaginationDto): Promise<ResponseUserDto[]> {
     const users = await this.findAll(paginationDto);
     return plainToInstance(
       ResponseUserDto,
@@ -53,7 +54,7 @@ export class UsersService {
   }
 
   // -----------FIND ONE-------------------------------------------------------------------------------
-  async findOne(term: string) {
+  async findOne(term: string): Promise<CreateUserDto> {
     let user: DocumentMongoose | null;
 
     if (isValidObjectId(term)) {
@@ -67,7 +68,7 @@ export class UsersService {
     return plainToInstance(CreateUserDto, user);
   }
   // -----------FIND ONE RESPONSE------------------------------------------------------------
-  async findOneResponse(term: string) {
+  async findOneResponse(term: string): Promise<ResponseUserDto> {
     const user = await this.findOne(term);
 
     return plainToInstance(ResponseUserDto, user, {
@@ -150,7 +151,7 @@ export class UsersService {
   //     this.handleDBErrors(error);
   //   }
   // }
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<ResponseUserDto> {
     let { password, confirmPassword } = updateUserDto;
 
     let updatedUser: DocumentMongoose | null;
@@ -181,7 +182,7 @@ export class UsersService {
   }
 
   // -----------DELETE-------------------------------------------------------------------------------
-  async remove(id: string, user: User) {
+  async remove(id: string, user: User): Promise<string> {
     let deletedUser: CreateUserDto | null;
 
     try {
@@ -204,7 +205,7 @@ export class UsersService {
 
   // -----------DELETE ALL USERS-------------------------------------------------------------------------------
   // Elimina todos los usuarios para poder eliminar la coleccion.
-  async removeAllUsers() {
+  async removeAllUsers(): Promise<string> {
     try {
       await this.userModel.deleteMany();
       return 'Documentos de la collecciín users eliminada con éxito';
@@ -226,7 +227,7 @@ export class UsersService {
   }
   // -----------GENERETE SEED USERS-------------------------------------------------------------------------------
   // Crea usuario hadcodeados en la coleccion users.
-  async genereteSeedUsers(createUserDto: CreateUserDto) {
+  async genereteSeedUsers(createUserDto: CreateUserDto): Promise<ResponseUserDto> {
     try {
       return await this.create(createUserDto);
     } catch (error) {

@@ -2,55 +2,62 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'; // SchemaFactory
 import { Document } from 'mongoose';
 import { Role } from '../enums/role.enums';
 import { ApiProperty } from '@nestjs/swagger';
-import { string } from 'joi';
 
 // Entity para base de datos mongoDB
 
 @Schema({
-  timestamps: true, 
+  timestamps: true,
 })
 export class User extends Document {
-
-  @ApiProperty({// Swagger: agrega este dato a la respuesta del endpoint
+  @ApiProperty({ // Swagger: agrega este dato a la respuesta del endpoint
     description: 'User name',
     example: 'Richard',
-    required: true
-  }) 
-  @Prop({ // Esto le indica que es una propiedad del documento
     required: true,
+  })
+  @Prop({  // Esto le indica que es una propiedad del documento
     trim: true,
+    required: true,
+    set: (value: string) => { // Capitaliza antes de gurdar.
+      if (!value) return value;
+      return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+    },
   })
   name: string;
 
-  @ApiProperty({// Swagger: agrega este dato a la respuesta del endpoint
+  @ApiProperty({
     description: 'User lastname',
     example: 'Kendy',
-    required: true
-  }) 
-  @Prop({
     required: true,
+  })
+  @Prop({
     trim: true,
+    required: true,
+    set: (value: string) => {
+      if (!value) return value;
+      return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+    },
   })
   lastname: string;
 
-  @ApiProperty({// Swagger: agrega este dato a la respuesta del endpoint
+  @ApiProperty({
     description: 'User email',
     example: 'richard@gmail.com',
     uniqueItems: true,
-    required: true
-  }) 
-  @Prop({
-    index: true,
     required: true,
+  })
+  @Prop({
+    required: true,
+    index: true,
     unique: true,
     trim: true,
+    lowercase: true,
   })
   email: string;
 
-  @ApiProperty({// Swagger: agrega este dato a la respuesta del endpoint
+  @ApiProperty({
     description: 'User password',
     example: 'Test123##',
-    required: true
+    required: true,
   })
   @Prop({
     required: true,
@@ -58,38 +65,37 @@ export class User extends Document {
   })
   password: string;
 
-  @ApiProperty({// Swagger: agrega este dato a la respuesta del endpoint
+  @ApiProperty({
     description: 'User role',
-    example: ["USER","OPERATOR","ADMIN","SUPERADMIN"],
+    example: ['USER', 'OPERATOR', 'ADMIN', 'SUPERADMIN'],
     enum: Role,
     default: 'USER',
-    required: false
+    required: false,
   })
   @Prop({
-    trim: true,
-    default: ["USER"],
     required: true,
+    trim: true,
+    default: ['USER'],
+    uppercase: true
   })
   roles: string[];
 
-  @ApiProperty({// Swagger: agrega este dato a la respuesta del endpoint
+  @ApiProperty({
     description: 'User is active?',
-    example: [true,false],
+    example: [true, false],
     default: true,
-    required: false
+    required: false,
   })
   @Prop({
     required: false,
-    default: true 
+    default: true,
   })
-  isActive: boolean
-  
+  isActive: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User); // SchemaFactory.createForClass: esto es lo que crea el modelo con el nombre user.
 
-
 // Recordar importar el schema en el modulo:
 // imports: [
-//   MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]), // Le indico al modulo el nombre y el esquema que va a usar 
+//   MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]), // Le indico al modulo el nombre y el esquema que va a usar
 // ],

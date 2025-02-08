@@ -9,7 +9,7 @@ import 'winston-mongodb';
 
 import { envLoader } from './appConfig/envLoader.config';
 import { envSchema } from './appConfig/envSchema.config';
-import { winstonConfigFactory } from './appConfig/winston.config';
+import { Logger } from './appConfig/winston.config';
 import { mongooseConfigFactory } from './appConfig/mongoose.config';
 
 import { CommonModule } from './common/common.module';
@@ -41,7 +41,7 @@ import { CorrelationIdMiddleware } from './middlewares/correlation-id.middleware
     WinstonModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: winstonConfigFactory,
+      useFactory: Logger,
     }),
 
     ServeStaticModule.forRoot({  // Indicamos la ruta de nuestras archivos publicos
