@@ -34,7 +34,7 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService) // Obtengo las variables de entorno desde: import { ConfigService } from '@nestjs/config';
   //console.log(configService)
-  const PORT = configService.get('port')
+  const PORT = configService.get<number>('port')
   await app.listen(Number(PORT)); // El valor por defecto en el caso que no lo este en el .env lo obtiene del envSchema
   logger.log(`App runing on port ${PORT}`)
 

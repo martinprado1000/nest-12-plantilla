@@ -1,6 +1,5 @@
 import {
   Injectable,
-  Inject,
   BadRequestException,
   NotFoundException,
   Logger,
@@ -19,18 +18,14 @@ import { ResponseUserDto } from './dto/response-user.dto';
 import { ConfigService } from '@nestjs/config';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { CustomLoggerService } from 'src/logger/logger.service';
-import { MongoUsersRepository } from './repositories/';
-import { USERS_REPOSITORY_INTERFACE, UsersRepositoryInterface } from './interfaces/users-repository.interface';
 
 @Injectable()
 export class UsersService {
   //private readonly logger = new Logger('UsersService'); // Genera un logger para este servicio.
   private defaultLimit: number;
   constructor(
-    @Inject(USERS_REPOSITORY_INTERFACE) private readonly usersRepository: UsersRepositoryInterface,
+    @InjectModel(User.name) private userModel: Model<User>,
     private readonly configService: ConfigService,
-    //private readonly usersRepository: MongoUsersRepository,
-    
     private readonly logger: CustomLoggerService,
   ) {
     this.defaultLimit = configService.get<number>('pagination.defaultLimit', 3); // Le pongo un limite default para poder tipar.
@@ -39,7 +34,10 @@ export class UsersService {
   // -----------FIND ALL---------------------------------------------------------------------------------
   async findAll(paginationDto: PaginationDto): Promise<User[]> {
     const { limit = this.defaultLimit, offset = 0 } = paginationDto;
-    return await this.usersRepository.findAll(limit, offset);
+    return await this.userModel
+      .find()
+      .skip(offset) // Salta los primeros `offset` registros
+      .limit(limit);
   }
 
   // -----------FIND ALL RESPONSE-------------------------------------------------------------
@@ -60,9 +58,9 @@ export class UsersService {
     let user: DocumentMongoose | null;
 
     if (isValidObjectId(term)) {
-      user = await this.usersRepository.findById(term);
+      user = await this.userModel.findById(term).lean();
     } else {
-      user = await this.usersRepository.findeByEmail(term);
+      user = await this.userModel.findOne({ email: term }).lean();
     }
 
     if (!user) throw new NotFoundException(`No se encontro el usuario ${term}`);
@@ -97,8 +95,9 @@ export class UsersService {
     createUserDto.password = hashedPassword;
 
     try {
-      let user = await this.usersRepository.create(createUserDto)
-        // as DocumentMongoose; // Tipeo el dato como un documento de mongoose.
+      let user = (await this.userModel.create(
+        createUserDto,
+      )) as DocumentMongoose; // Tipeo el dato como un documento de mongoose.
 
       const userResponse: ResponseUserDto = plainToInstance(
         ResponseUserDto,
@@ -166,7 +165,9 @@ export class UsersService {
     }
 
     try {
-      updatedUser = await this.usersRepository.update(id, updateUserDto)
+      updatedUser = await this.userModel.findByIdAndUpdate(id, updateUserDto, {
+        new: true,
+      });
     } catch (error) {
       this.handleDBErrors(error);
     }
@@ -181,11 +182,11 @@ export class UsersService {
   }
 
   // -----------DELETE-------------------------------------------------------------------------------
-  async delete(id: string, user: User): Promise<string> {
-    let deletedUser: DocumentMongoose | null;
+  async remove(id: string, user: User): Promise<string> {
+    let deletedUser: CreateUserDto | null;
 
     try {
-      deletedUser = await this.usersRepository.delete(id);
+      deletedUser = await this.userModel.findByIdAndDelete(id);
       this.logger.error('This is an error', UsersService.name, 'Error detail');
       this.logger.warn('This is a warning', UsersService.name, 'Warn detail');
       this.logger.log('This is an info log', UsersService.name, 'Log detail'); // info
@@ -206,7 +207,7 @@ export class UsersService {
   // Elimina todos los usuarios para poder eliminar la coleccion.
   async removeAllUsers(): Promise<string> {
     try {
-      await this.usersRepository.deleteAllUsers();
+      await this.userModel.deleteMany();
       return 'Documentos de la collecciín users eliminada con éxito';
     } catch (error) {
       throw new Error(
@@ -218,7 +219,7 @@ export class UsersService {
   // Elimina la colleción users.
   async deleteUsersCollection(): Promise<string> {
     try {
-      await this.usersRepository.deleteUsersCollection();
+      await this.userModel.collection.drop();
       return 'Colección users eliminada con éxito';
     } catch (error) {
       throw new Error('No se pudo eliminar la colección users');

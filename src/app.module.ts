@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule, Request } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, Request, RequestMethod } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -48,7 +48,9 @@ import { CorrelationIdMiddleware } from './middlewares/correlation-id.middleware
       rootPath: join(__dirname,'..','public'), 
     }),
 
-    CommonModule,
+    //CommonModule,
+
+    ConfigModule.forRoot({ isGlobal: true }),
 
     LoggerModule,
     
@@ -61,9 +63,18 @@ import { CorrelationIdMiddleware } from './middlewares/correlation-id.middleware
   ],
 })
 
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+//   }
+// }
+// Se reemplazo la config de middleware en la nueve version. Hay que agregar todas las rutas para que no lance el WARN
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+    consumer.apply(CorrelationIdMiddleware).forRoutes(
+      { path: 'api/auth', method: RequestMethod.ALL },
+      { path: 'api/users', method: RequestMethod.ALL },
+      // Agregar otras rutas aquí
+    );
   }
 }
-

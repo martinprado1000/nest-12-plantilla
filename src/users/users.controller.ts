@@ -102,6 +102,6 @@ export class UsersController {
   @Auth(ValidRoles.SUPERADMIN)
   @HttpCode(204) // Si retorno un codigo 204 por mas que haga un return no retorna nada, si retorna las excepciones.
   async remove(@Param('id', idMongoPipe) id: string, @GetUser() user: User) {
-    return await this.usersService.remove(id, user);
+    return await this.usersService.delete(id, user);
   }
 }

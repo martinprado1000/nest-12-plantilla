@@ -8,6 +8,7 @@ export const envSchema = Joi.object({
   HOST_API: Joi.string().required(),
   NODE_ENV: Joi.string().default('dev'),
   JWT_SECRET: Joi.string().required(),
+  DATABASE_PERSISTENCE: Joi.string().default('mongo'),
   DATABASE_URI: Joi.string().required(),
   DATABASE_PORT: Joi.string(),
   DATABASE_NAME: Joi.string(),
