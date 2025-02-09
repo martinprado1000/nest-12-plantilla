@@ -4,7 +4,6 @@ export const envLoader = () => ({
     port: Number(process.env.PORT),
     hostApi: process.env.HOST_API,
     database: {
-        persistence: process.env.DB_PERSISTENCE,
         uri: process.env.DATABASE_URI,
         port: process.env.DATABASE_PORT,
         name: process.env.DATABASE_NAME,
