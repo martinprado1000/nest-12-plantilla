@@ -19,7 +19,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'Mongo Id (unique)',
-    type: string,
+    type: 'string',
     nullable: true, // True porque viene siempre nulo
     example: "67a1a6c23504ec3e184cc14a",
   })
@@ -32,7 +32,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'User name',
-    type: string,
+    type: 'string',
     minLength: 2,
     nullable: false, // no puede venir nulo
     example: 'Richard'
@@ -46,7 +46,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'User lastname',
-    type: string,
+    type: 'string',
     minLength: 2,
     nullable: false,
     example: 'Kendy'
@@ -60,7 +60,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'User email',
-    type: string,
+    type: 'string',
     nullable: false,
     example: 'richard@gmail.com'
   })
@@ -71,7 +71,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'User password',
-    type: string,
+    type: 'string',
     nullable: false,
     example: 'Test123##'
   })
@@ -88,7 +88,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'User confirm password',
-    type: string,
+    type: 'string',
     nullable: false,
     example: 'Test123##'
   })
@@ -107,13 +107,14 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'User role',
-    type: array,
+    type: 'array',
     enum: Role,
     nullable: true,
     example: 'USER'
   })
   @IsOptional()
   @IsEnum(Role, { each: true })
+  @Transform(({ value }) => value ?? [Role.USER]) // Si no viene un Role le asigna el rol USER al dto para que no pueda ser undefined cuando lo usemos.
   @Transform(({ value }) => {
     if (!value) return undefined; // Si no hay valor, retorna undefined (evita errores)
     if (typeof value === 'string') {
@@ -128,13 +129,13 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'User is active?',
-    type: boolean,
+    type: 'boolean',
     nullable: true,
     example: true
   })
   @IsOptional()
   @IsBoolean()
-  isActive: boolean;
+  isActive?: boolean;
 }
 
 function capitalize(value: string): string {

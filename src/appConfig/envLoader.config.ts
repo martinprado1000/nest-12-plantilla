@@ -14,5 +14,6 @@ export const envLoader = () => ({
         defaultLimit: Number(process.env.PAGINATIONS_DEFAULT_LIMIT)
         // Si quiero puedo poner un valor por defecto aca pero va atener mas fuerza el que configure en el Joi. Obviamente si el valor no viene defenido en la variable de entorno.
     },
-    passwordSeedUsers: process.env.PASSWORD_SEED_USERS
+    passwordSeedUsers: process.env.PASSWORD_SEED_USERS,
+    audit: process.env.AUDIT
 })

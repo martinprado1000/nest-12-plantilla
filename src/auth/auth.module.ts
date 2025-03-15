@@ -18,8 +18,11 @@ import { User, UserSchema } from '../users/schemas/user.schema';
 import { UsersModule } from 'src/users/users.module';
 
 @Module({
+
   controllers: [AuthController],
+
   providers: [AuthService, JwtStrategy],
+
   imports: [
 
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
@@ -37,7 +40,7 @@ import { UsersModule } from 'src/users/users.module';
         return {
           secret: configService.get<string>('JWT_SECRET'),
           signOptions: {
-            expiresIn:'2h'
+            expiresIn:'8h'
           }
         }
       }
@@ -52,5 +55,6 @@ import { UsersModule } from 'src/users/users.module';
   ],
 
   exports: [ AuthService, JwtStrategy, PassportModule, JwtModule, MongooseModule ], // Los exporto para el caso que necesite validar algo de jwt en otro lado.
+
 })
 export class AuthModule {}

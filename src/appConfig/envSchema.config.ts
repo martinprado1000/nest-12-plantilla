@@ -15,4 +15,5 @@ export const envSchema = Joi.object({
   DATABASE_PASSWORD: Joi.string().allow('', null),
   PAGINATIONS_DEFAULT_LIMIT: Joi.number().default(20), 
   PASSWORD_SEED_USERS: Joi.string().required(),
+  AUDIT: Joi.boolean().default(false),
 });

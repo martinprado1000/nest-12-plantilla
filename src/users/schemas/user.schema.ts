@@ -3,8 +3,6 @@ import { Document } from 'mongoose';
 import { Role } from '../enums/role.enums';
 import { ApiProperty } from '@nestjs/swagger';
 
-// Entity para base de datos mongoDB
-
 @Schema({
   timestamps: true,
 })
@@ -69,16 +67,16 @@ export class User extends Document {
     description: 'User role',
     example: ['USER', 'OPERATOR', 'ADMIN', 'SUPERADMIN'],
     enum: Role,
-    default: 'USER',
+    default: Role.USER,
     required: false,
   })
   @Prop({
     required: true,
     trim: true,
-    default: ['USER'],
+    default: Role.USER,
     uppercase: true
   })
-  roles: string[];
+  roles: Role[];
 
   @ApiProperty({
     description: 'User is active?',

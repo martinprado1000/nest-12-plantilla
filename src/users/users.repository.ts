@@ -5,20 +5,19 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Document as DocumentMongoose, isValidObjectId, Model } from 'mongoose';
 
-import { User } from '../schemas/user.schema';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
-import { UsersRepositoryInterface } from '../interfaces/users-repository.interface';
+import { User } from './schemas/user.schema';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersRepositoryInterface } from './interfaces/users-repository.interface';
 
 @Injectable()
-export class MongoUsersRepository implements UsersRepositoryInterface {
+export class UsersRepository implements UsersRepositoryInterface {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
   // -----------FIND ALL---------------------------------------------------------------------------------
   async findAll(limit: number, offset: number): Promise<User[]> {
-    console.log("mongoooooo")
     return await this.userModel
       .find()
       .skip(offset) // Salta los primeros `offset` registros
@@ -37,13 +36,13 @@ export class MongoUsersRepository implements UsersRepositoryInterface {
 
   // -----------CREATE------------------------------------------------------------------------------------
   async create(createUserDto: CreateUserDto): Promise<User> {
-    return (await this.userModel.create(createUserDto)); // Tipeo el dato como un documento de mongoose.
+    return (await this.userModel.create(createUserDto));
   }
 
   // -----------UPDATE-------------------------------------------------------------------------------
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User | null> {
     return await this.userModel.findByIdAndUpdate(id, updateUserDto, {
-      new: true, // ew: retorna el nuevo valor ya editado.
+      new: true, // new:true : retorna el nuevo valor ya editado.
     });
   }
 

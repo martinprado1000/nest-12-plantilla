@@ -1,14 +1,10 @@
 import {
-  BadRequestException,
   Injectable,
-  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt'; // Importamos jwt
 
 import * as bcrypt from 'bcrypt';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
 import { plainToInstance } from 'class-transformer';
 
 import { JwtPayload } from './interfaces/jwt-payload.interface';
@@ -23,7 +19,6 @@ import { response } from 'express';
 export class AuthService {
   constructor(
     private readonly userService: UsersService,
-    @InjectModel(User.name) private userModel: Model<User>,
     private readonly jwtService: JwtService, // Este es el modulo de jwt que interactua con el jwtModulo creado por nosotros
   ) {}
 
@@ -43,8 +38,9 @@ export class AuthService {
     const { password, email } = loginAuthDto;
 
     const user = await this.userService.findOne(email);
-    // if (!user)
-    //   throw new UnauthorizedException('Credential are not valid (email)');
+
+    if (user?.isActive === false)
+      throw new UnauthorizedException('User is inactive, talk with an admin');
 
     if (!bcrypt.compareSync(password, user.password))
       throw new UnauthorizedException('Credential are not valid (password)');
@@ -78,15 +74,13 @@ export class AuthService {
     return token;
   }
 
-  private handleDBErrors(error: any): never {
-    // Esta funcion retorna never porque nunca va a retornar nada. Solo puede lanzar una axection.
-    console.log(error);
-    if (error.code === 11000)
-      throw new BadRequestException(
-        `El usuario ${JSON.stringify(error.keyValue.email)} ya existe`,
-      );
-
-    console.log(error);
-    throw new InternalServerErrorException('Please check server logs');
-  }
+  // private handleDBErrors(error: any): never {
+  //   // Esta funcion retorna never porque nunca va a retornar nada. Solo puede lanzar una axection.
+  //   if (error.code === 11000)
+  //     throw new BadRequestException(
+  //       `El usuario ${JSON.stringify(error.keyValue.email)} ya existe`,
+  //     );
+  //   throw new InternalServerErrorException('Please check server logs');
+  // }
+  
 }

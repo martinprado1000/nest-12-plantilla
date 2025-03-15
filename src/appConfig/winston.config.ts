@@ -1,109 +1,102 @@
 import { ConfigService } from '@nestjs/config';
 import { WinstonModuleOptions } from 'nest-winston';
-import { CorrelationIdMiddleware } from 'src/middlewares/correlation-id.middleware';
+import { CorrelationIdMiddleware } from '../common/middlewares/correlation-id.middleware';
 import * as winston from 'winston';
+import 'winston-daily-rotate-file';
 import 'winston-mongodb';
+import * as moment from 'moment';
 
 // Definir tipo para metadata en logs
-interface LogMeta {
-  correlationId?: string;
-  [key: string]: any;
-}
+// interface LogMeta {
+//   correlationId?: string;
+//   context?: string;
+//   messageDetail?: string;
+// }
 
-// 🛠️ Función para obtener Correlation ID
+// 🔹 Función para obtener Correlation ID
 const getCorrelationId = () => CorrelationIdMiddleware.getCorrelationId() || 'no-correlation-id';
 
-// 🛠️ Formato de logs compartido
-const logFormat = winston.format.combine(
+// 🔹 Formato de logs compartido
+const logFormatCompart = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD_HH:mm:ss' }),
-  winston.format.printf(({ level, message, timestamp }) => {
-    return `[${level.toUpperCase()}] ${timestamp} [Cid: ${getCorrelationId()}] ${message}`;
-  }),
 );
 
-// 🛠️ Formato de logs en JSON (para MongoDB)
 const mongoLogFormat = winston.format.combine(
-  winston.format.timestamp(),
-  winston.format.json(),
+  winston.format.timestamp({ format: 'YYYY-MM-DD_HH:mm:ss' }),
   winston.format((info) => {
     info.correlationId = getCorrelationId();
+    info.trace = info.trace || 'No-Trace'; 
+    info.context = info.context || 'No-Context';
     return info;
   })(),
+  winston.format.json(),
 );
 
-// 🛠️ Función para crear el logger
+
 export const Logger = (configService: ConfigService): WinstonModuleOptions => ({
-  format: logFormat,
+  //format: logFormat,
   transports: [
 
     new winston.transports.Console({
-      level: 'silly', // Configurado para registrar todos los niveles
+      level: 'silly',
       format: winston.format.combine(
-        winston.format.timestamp(),
+        winston.format.timestamp({ format: 'YYYY-MM-DD_HH:mm:ss' }),
         winston.format.ms(),
         winston.format.colorize(),
         winston.format.printf(({ level, message, timestamp, context, trace }) => {
-          return `[${level}] ${timestamp} [Cid: ${getCorrelationId()}] ${context || ''}: ${message}. Detail: ${trace || 'no-detail'}`;
+          return `[${level}] ${timestamp} [Cid: ${getCorrelationId()}] ${ context || 'No-Context'}: ${message}. Trace: ${ trace || 'No-Trace'}`;
         }),
       ),
     }),
+    
+    // Con este transport genera archivo de log y lo sobreescribe segun lo configurado en maxFiles.
+    // new winston.transports.File({
+    //   level: "http",
+    //   filename: `./logsFiles/logs-${moment().format('YYYY-MM-DD')}.log`,
+    //   maxsize: 5120000,       // Tamaño maximo del archivo en bits, cuando se completa crea otro archivo.
+    //   //maxFiles: 3,          // "OJO" Cantidad maxima de archivos, luego del tercero se van sobreescribiendo.
+    //   format: winston.format.combine(
+    //     winston.format.timestamp({ format: 'YYYY-MM-DD_HH:mm:ss' }),
+    //     winston.format.json(),
+    //   ), 
+    // }),
+
+    //Con este transport genera varios archivo de log y los va rotando, Y genera archivo audit de la rotación.
+    new winston.transports.DailyRotateFile({
+      level: 'http',
+      filename: `./logsFiles/logsRatate-%DATE%.log`,  // %DATE% será reemplazado por la fecha
+      datePattern: 'YYYY-MM-DD',          // Formato de fecha en los archivos
+      maxSize: '5m',                      // Máximo 5MB por archivo antes de rotar
+      maxFiles: '3d',                     // Mantiene logs de los últimos 3 días
+      zippedArchive: false,               // No comprimir archivos antiguos
+      //auditFile: false,                 // No genera el archivo audit, se usa para rastrear y administrar la rotación de archivos de log.
+      // Asi genera el log NO en JSON
+      // format: winston.format.combine(
+      //   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+      //   winston.format.printf(({ level, message, timestamp, context, trace }) => {
+      //     return `[${level}] ${timestamp} [Cid: ${getCorrelationId()}] ${ context || 'No-Context'}: ${message}. Trace: ${ trace || 'No-Trace'}`;
+      //   }),
+      // ),
+      // Asi genera el log en JSON
+      format: winston.format.combine(
+        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        winston.format(info => {
+          return {
+            ...info,
+            correlationId: getCorrelationId(),
+            trace: info.trace || 'No-Trace'
+          };
+        })(),
+        winston.format.json()
+      )
+    }),    
 
     new winston.transports.MongoDB({
-      level: 'info',
-      //db: 'mongodb://localhost:27017/nest-10-plantilla',
-      db: configService.get<string>('database.uri') || 'mongodb://localhost:27017/nest-10-plantilla',
-      collection: 'logs',
+      level: 'http',
       format: mongoLogFormat,
-      
+      db: configService.get<string>('database.uri') || 'mongodb://localhost:27017/nest-11-plantilla',
+      collection: 'logs',
     }),
+    
   ],
 });
-
-
-//------------------------------------------------
-// import * as winston from 'winston';
-// import 'winston-mongodb';
-
-// Define un tipo para el meta que incluye correlationId
-// interface LogMeta {
-//   correlationId?: string;
-//   [key: string]: any; // Permitir otros campos opcionales
-// }
-
-// // Configuración de Winston
-// export const Logger = winston.createLogger({ 
-//   level: 'silly', // Permitir logs de todos los niveles
-//   format: winston.format.combine(
-//     winston.format.timestamp({ format: 'YYYY-MM-DD_HH:mm:ss' }),
-//     winston.format.printf(({ timestamp, level, message, meta }: { timestamp: string; level: string; message: string; meta?: LogMeta }) => {
-//       const correlationId = meta?.correlationId || 'N/A';
-//       return `${timestamp} [${level.toUpperCase()}] [CorrelationId: ${correlationId}] ${message}`;
-//     }),
-//   ),
-//   transports: [
-//     new winston.transports.Console({
-//       format: winston.format.combine(
-//         winston.format.colorize(), // Colores en la consola
-//       ),
-//     }),
-//     new winston.transports.MongoDB({
-//       level: 'silly', // Guardar logs de todos los niveles
-//       db: 'mongodb://localhost:27017/logs',
-//       collection: 'application_logs',
-//       tryReconnect: true,
-//       options: { useUnifiedTopology: true },
-//       format: winston.format.combine(
-//         winston.format.timestamp(),
-//         winston.format.json(), // Guardar logs en formato JSON en MongoDB
-//       ),
-//     }),
-//   ],
-// });
-
-// // Prueba de logs
-// Logger.silly('Este es un mensaje de nivel silly');
-// Logger.debug('Este es un mensaje de nivel debug');
-// Logger.verbose('Este es un mensaje de nivel verbose');
-// Logger.info('Este es un mensaje de nivel info');
-// Logger.warn('Este es un mensaje de nivel warn');
-// Logger.error('Este es un mensaje de nivel error');

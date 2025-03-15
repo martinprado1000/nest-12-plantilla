@@ -25,7 +25,7 @@ export class UserRoleGuard implements CanActivate {
     //const validRolesTest: string[] = this.reflector.get( 'rolesTest' , context.getHandler() ) // Reflector: asi accedems a la metadata que pasamos en el decorador pers.
     //console.log(validRolesTest)
         
-    // Para lo de acontinuacion la metadata fua agregada con el decorador personalizado @RoleProtected.
+    // Para lo de acontinuacion la metadata fue agregada con el decorador personalizado @RoleProtected.
     const validRoles: string[] = this.reflector.get( META_ROLES, context.getHandler() ) // Obtenemos los roles.
     //console.log(validRoles)
 
@@ -50,7 +50,7 @@ export class UserRoleGuard implements CanActivate {
     }
     
     throw new ForbiddenException(
-      `User ${ user.name } need a valid roles: [${ validRoles }]`
+      `User ${ user.email } need a valid roles: [${ validRoles }]`
     );
 
     // Podemos retornar solo falce y esto retornaria 403 Forbidden o una exepcion como en este caso explicando el acceso.

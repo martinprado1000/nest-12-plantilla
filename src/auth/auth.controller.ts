@@ -22,11 +22,11 @@ import { ValidRoles } from './interfaces';
 import { CreateUserDto } from 'src/users/dto';
 
 import {
-  GetUser,
   EmailTest,
   HeadersTest,
   RoleProtected,
   Auth,
+  GetUser,  // No puedo usar este decorador si antes no aplique el decorador Auth, porque si no esta autenticado no existe el usuario que queremos recuperar.
 } from './decorators';
 
 @Controller('auth')
@@ -43,6 +43,7 @@ export class AuthController {
   @Post('login')
   @ApiResponse({ status:201, description: 'User logged in', type: User }) // Type es lo que retorna
   @ApiResponse({ status:400, description: 'Bad request' })
+  @ApiResponse({ status:401, description: 'User is inactive, talk with an admin' })
   loginUser(@Body() loginUserDto: LoginUserDto) {
     return this.authService.login(loginUserDto);
   }

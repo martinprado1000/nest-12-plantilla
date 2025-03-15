@@ -8,32 +8,32 @@ export class CustomLoggerService implements LoggerService {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
-  error(message: string, context?: string, trace?: string) { // Errores críticos que detienen la ejecución de la aplicación.
+  error(context: string, message: string, trace?: string) { // Errores críticos que detienen la ejecución de la aplicación.
     this.logger.error(message, { trace, context });
   }
 
-  warn(message: string, context?: string, trace?: string) { // Advertencias sobre posibles problemas que no afectan la ejecución inmediata.
+  warn(context: string, message: string, trace?: string) { // Advertencias sobre posibles problemas que no afectan la ejecución inmediata.
     this.logger.warn(message, { trace, context });
   }
 
   // Para auditoria.
-  log(message: string, context?: string, trace?: string) { // Información general del sistema. Este nivel seria para llevar a cabo un auditoria.
+  log(context: string, message: string, trace?: string) { // Información general del sistema. Este nivel seria para llevar a cabo un auditoria.
     this.logger.info(message, { trace, context });
   }
   // Para auditoria de una api.
-  http(message: string, context?: string, trace?: string) { // Registros de peticiones HTTP y respuestas del servidor. Este nivel seria para llevar a cabo un auditoria de una api.
+  http(context: string, message: string, trace?: string) { // Registros de peticiones HTTP y respuestas del servidor. Este nivel seria para llevar a cabo un auditoria de una api.
     this.logger.http(message, { trace, context });
   }
 
-  verbose(message: string, context?: string, trace?: string) { // Información detallada sobre la ejecución (útil para depuración avanzada). 
+  verbose(context: string, message: string, trace?: string) { // Información detallada sobre la ejecución (útil para depuración avanzada). 
     this.logger.verbose(message, { trace, context });
   }
 
-  debug(message: string, context?: string, trace?: string) { // Mensajes usados para depuración (detalles internos del código).
+  debug(context: string, message: string, trace?: string) { // Mensajes usados para depuración (detalles internos del código).
     this.logger.debug(message, { trace, context });
   }
 
-  silly(message: string, context?: string, trace?: string) { // Información extremadamente detallada (rara vez necesario).
+  silly(context: string, message: string, trace?: string) { // Información extremadamente detallada (rara vez necesario).
     this.logger.silly(message, { trace, context });
   }
 
@@ -45,5 +45,8 @@ export class CustomLoggerService implements LoggerService {
 // logger.verbose('Carga de configuración completada');
 // logger.debug('Variable X tiene el valor esperado');
 // logger.silly('El sistema usó 0.0001ms en esta operación');
+
+                    // Servicio        // Mensaje                                          // Traza
+// this.logger.http(UsersService.name, `Usuario ${activeUser._id} editó al usuario ${id}`, `PATCH/${id}`);
 
 }

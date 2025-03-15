@@ -1,4 +1,4 @@
-// Este decorador personalizado lo que hace es asegurarce que el usuario lo estemos obteniendo del contexto.
+// Este decorador de parametro personalizado lo que hace es asegurarce que el usuario lo estemos obteniendo del contexto.
 import { createParamDecorator, ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 
 export const HeadersTest = createParamDecorator(       // createParamDecorator: crea el decorador

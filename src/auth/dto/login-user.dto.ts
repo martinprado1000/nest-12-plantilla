@@ -13,7 +13,7 @@ export class LoginUserDto {
 
   @ApiProperty({
     description: 'User email',
-    type: string,
+    type: 'string',
     nullable: false,
     example: 'richard@gmail.com',
   })
@@ -23,7 +23,7 @@ export class LoginUserDto {
 
   @ApiProperty({
     description: 'User password',
-    type: string,
+    type: 'string',
     nullable: false,
     example: 'Test123##'
   })
