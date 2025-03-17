@@ -2,10 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } fr
 import { TestService } from './test.service';
 import { TestInterceptor1, TestInterceptor2, TestInterceptor3 } from './decorators/test.interceptor';
 import { TestDecorator } from './decorators/test.decorator';
-import { Audit } from 'src/common/decorators/audit.decorator';
 import { ValidRoles } from 'src/auth/interfaces';
 import { Auth } from 'src/auth/decorators';
-import { AuditInterceptor } from 'src/common/decorators/audit.interceptor';
+import { AuditInterceptor } from 'src/auditLogs/decorators/audit.interceptor';
+import { Audit } from 'src/auditLogs/decorators/audit.decorator';
 
 
 @Controller('test')
@@ -41,6 +41,7 @@ export class TestController {
     return this.testService.remove(id);
   }
 
+  @TestDecorator()
   @UseInterceptors(AuditInterceptor)
   @Audit()
   @Get('5/:id')

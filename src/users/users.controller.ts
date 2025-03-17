@@ -18,9 +18,8 @@ import { PaginationDto } from '../common/dtos/pagination.dto';
 import { idMongoPipe } from '../common/pipes/idMongo.pipe';
 import { ValidRoles } from 'src/auth/interfaces';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-
-import { Audit } from 'src/common/decorators/audit.decorator';
-import { AuditInterceptor } from 'src/common/decorators/audit.interceptor';
+import { AuditInterceptor } from 'src/auditLogs/decorators/audit.interceptor';
+import { Audit } from 'src/auditLogs/decorators/audit.decorator';
 
 //@ApiTags('Asi podria cambiar el titulo de estos endpoints de Swager') //Swagger: @ApiTags= Asi podria cambiar el titulo de estos endpoints, si no tomo el nomber del endpoint.
 @UseInterceptors(AuditInterceptor)

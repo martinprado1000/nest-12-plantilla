@@ -51,7 +51,7 @@ export class AuditInterceptor implements NestInterceptor {
     //console.log(entity)
     //console.log(entityId)
 
-    const isAuditEnabled = this.reflector.get<boolean>(
+    const isAuditEnabled = this.reflector.get<boolean>( // Obtiene el valor de AUDIT_METADATA_KEY para sabe si tiene que auditar el endpoint.
       AUDIT_METADATA_KEY,
       context.getHandler(),
     );
