@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 
 import { CreateAuditLogsDto } from './dto/create-auditLogs.dto';
 import {
-  AUDITLOG_REPOSITORY_INTERFACE,
+  AUDITLOGS_REPOSITORY_INTERFACE,
   AuditLogsRepositoryInterface,
 } from './interfaces/auditLogs-repository.interface';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
@@ -15,7 +15,7 @@ export class AuditLogsService {
 
     private readonly configService: ConfigService,
 
-    @Inject(AUDITLOG_REPOSITORY_INTERFACE)
+    @Inject(AUDITLOGS_REPOSITORY_INTERFACE)
 
     private readonly auditLogsRepository: AuditLogsRepositoryInterface,
 

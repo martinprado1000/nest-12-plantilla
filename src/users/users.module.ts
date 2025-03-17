@@ -11,6 +11,7 @@ import {
   USERS_REPOSITORY_INTERFACE,
 } from './interfaces/users-repository.interface';
 import { AuditLogsModule } from 'src/auditLogs/auditLogs.module';
+import { ResolveEntityModule } from 'src/resolve-entity/resolve-entity.module';
 
 @Module({
 
@@ -19,8 +20,7 @@ import { AuditLogsModule } from 'src/auditLogs/auditLogs.module';
   providers: [ 
     UsersService,
     CustomLoggerService,
-    UsersRepository,// Inyectamos la dependencia del repositorio indicandole que clase usar cuando llame a la interface USERS_REPOSITORY
-    {
+    { // Inyectamos la dependencia del repositorio indicandole que clase usar cuando llame a la interface USERS_REPOSITORY
       provide: USERS_REPOSITORY_INTERFACE,
       useClass: UsersRepository 
     },
@@ -29,8 +29,10 @@ import { AuditLogsModule } from 'src/auditLogs/auditLogs.module';
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]), // Le indico al modulo el nombre y el esquema que va a usar
     ConfigModule, 
-    forwardRef(() => AuthModule), // forwardRef: Como el modulo Users depende del de Auth tengo que importarlo con forwardRef para solucionar la dependencia circular
-    AuditLogsModule
+    // Como el intercetor depende de ResolveEntityModule y el UsersModule tengo que importarlos con forwardRef para no generar dependencia circular.
+    forwardRef(() => ResolveEntityModule),
+    forwardRef(() => AuthModule),
+    AuditLogsModule,
   ],
 
   exports: [UsersService],

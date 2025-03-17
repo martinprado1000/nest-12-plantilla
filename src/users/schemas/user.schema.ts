@@ -3,8 +3,20 @@ import { Document } from 'mongoose';
 import { Role } from '../enums/role.enums';
 import { ApiProperty } from '@nestjs/swagger';
 
+function formatDate(date: Date): string {
+  return date.toISOString().replace('T', '_').split('.')[0]; // "2025-03-17_00:38:17"
+}
+
 @Schema({
   timestamps: true,
+  toJSON: {
+    virtuals: true,
+    transform: (_doc, ret) => {
+      ret.createdAt = formatDate(ret.createdAt);
+      ret.updatedAt = formatDate(ret.updatedAt);
+      return ret;
+    },
+  },
 })
 export class User extends Document {
   @ApiProperty({ // Swagger: agrega este dato a la respuesta del endpoint
@@ -89,6 +101,7 @@ export class User extends Document {
     default: true,
   })
   isActive: boolean;
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User); // SchemaFactory.createForClass: esto es lo que crea el modelo con el nombre user.

@@ -22,7 +22,7 @@ import { CorrelationIdMiddleware, } from './common/middlewares/correlation-id.mi
 import { Request } from 'express';
 //import { LoggerModule } from 'nestjs-pino';
 import { TestModule } from './test/test.module';
-import { ResolveEntityModule } from './common/decorators/resolve-entity.module';
+import { ResolveEntityModule } from './resolve-entity/resolve-entity.module';
 
 @Module({
   imports: [
@@ -77,6 +77,8 @@ import { ResolveEntityModule } from './common/decorators/resolve-entity.module';
     //CommonModule,
 
     //LoggerModule,
+
+    ResolveEntityModule,
     
     AuthModule,
 
@@ -87,8 +89,6 @@ import { ResolveEntityModule } from './common/decorators/resolve-entity.module';
     AuditLogsModule,
 
     TestModule,
-
-    ResolveEntityModule,
 
   ]
   

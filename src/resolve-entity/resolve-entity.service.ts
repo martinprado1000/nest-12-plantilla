@@ -17,7 +17,7 @@ export class ResolveEntityService {
     };
   }
 
-  async findOne(entity: string, id: string): Promise<any> {
+  async findOneResponse(entity: string, id: string): Promise<any> {
     const service = this.entityServices[entity];
 
     if (!service || !service.findOneResponse) {

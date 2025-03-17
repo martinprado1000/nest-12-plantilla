@@ -78,9 +78,17 @@ http://localhost:3000/api#
 
 Configuraciones:
 
-* Entidades: User, Auth, Logger
+* Entidades: User, Auth, Logger, Test, ResolveEntity, AuditLog
 
-* Autenticacion y autorizacion. Recibe roles, string o arreglo: SUPERADMIN, ADMIN, OPERATOR, USER.
+* Entidad Auth. Recibe roles, string o arreglo: SUPERADMIN, ADMIN, OPERATOR, USER.<br>
+-Decorar el controller con: @Auth(ValidRoles.XXX, ValidRoles.XXX)
+
+* Entidad AuditLog.<br>
+-En variable de entorno asignar la variable AUDIT=true<br> 
+-Decorar la clase del controller con: @UseInterceptors(AuditInterceptor).<br> 
+-Decorar los metodos a auditar con: @Audit()
+
+* Entidad Test hay ejemplos de decoradores e interceptores.
 
 * .env  .env.template  .env.prod.
 
@@ -94,9 +102,8 @@ Configuraciones:
 
 * Patrón repository implementado en la entidad de users. Si por .env pasamos el valor 'mongo' en persistence usa el repository de mongo, de lo contrario usa el repository sql (No esta configurado como db sql)
 
-* Corrección de configuración de middleware, agregar todas la rutas en la configuracion.
-
 * Si ejecuto en mode dev solo esta dockerizada la db. 
 
 * En prod usamos el archivo docker-compose.prod.yml donde esta dockerizada la app y la db.
+
 

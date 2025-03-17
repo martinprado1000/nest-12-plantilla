@@ -31,8 +31,8 @@ export const initialData: SeedData = {
             name: 'Test_superadmin_name',
             lastname: 'Test superadmin lastname',
             email: 'superadmin@google.com',
-            password: passwordSeedUsers,
-            confirmPassword: passwordSeedUsers,
+            password: "Password123**",
+            confirmPassword: "Password123**",
             roles: [Role.SUPERADMIN],
             isActive: true
         },

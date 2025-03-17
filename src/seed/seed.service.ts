@@ -55,8 +55,8 @@ export class SeedService {
   // Inseta los usuarios hardcodeados
   private async insertUserData() {
     const seedUsers = initialData.users;
-    seedUsers.forEach((user) => {
-      this.usersService.create(user);
+    seedUsers.forEach( async (user) => {
+      await this.usersService.create(user);
     });
     return 'Usuarios creados con éxito';
   }

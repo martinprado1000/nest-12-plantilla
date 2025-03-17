@@ -3,9 +3,7 @@ import { ApiResponse } from '@nestjs/swagger';
 import { AuditLogsService } from './auditLogs.service';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { Audit } from 'src/common/decorators/audit.decorator';
-import { AuditInterceptor } from 'src/common/decorators/audit.interceptor';
 
-//@UseInterceptors(AuditInterceptor)
 @Controller('auditLogs')
 export class AuditLogsController {
   constructor(private readonly auditLogsService: AuditLogsService) {}

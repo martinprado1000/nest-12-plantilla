@@ -4,10 +4,8 @@ import { CreateAuditLogsDto } from '../dto/create-auditLogs.dto';
 import { Action } from '../enums/action.enums';
 import { ApiProperty } from '@nestjs/swagger';
 
-//export type AuditDocument = HydratedDocument<Audit>;
-
 @Schema({
-  timestamps: true,
+  timestamps: true, // Habilita `createdAt` y `updatedAt`
 })
 export class AuditLogs extends Document {
   @ApiProperty({// Swagger: agrega este dato a la respuesta del endpoint
@@ -50,6 +48,7 @@ export class AuditLogs extends Document {
     type: Object,
   })
   afterData?: CreateAuditLogsDto; // Datos posteriores (en caso de CREATE o UPDATE)
+
 }
 
 export const AuditLogsSchema = SchemaFactory.createForClass(AuditLogs);

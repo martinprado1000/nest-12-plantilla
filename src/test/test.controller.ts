@@ -2,12 +2,14 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } fr
 import { TestService } from './test.service';
 import { TestInterceptor1, TestInterceptor2, TestInterceptor3 } from './decorators/test.interceptor';
 import { TestDecorator } from './decorators/test.decorator';
-import { AuditInterceptor2 } from 'src/common/decorators/audit2.interceptor';
-import { AuditInterceptor } from 'src/common/decorators/audit.interceptor';
 import { Audit } from 'src/common/decorators/audit.decorator';
+import { ValidRoles } from 'src/auth/interfaces';
+import { Auth } from 'src/auth/decorators';
+import { AuditInterceptor } from 'src/common/decorators/audit.interceptor';
 
 
 @Controller('test')
+@Auth(ValidRoles.SUPERADMIN, ValidRoles.ADMIN)
 export class TestController {
 
   constructor(private readonly testService: TestService) {}
@@ -32,10 +34,18 @@ export class TestController {
     return this.testService.update();
   }
   
-  @UseInterceptors(AuditInterceptor2)
+  @UseInterceptors(AuditInterceptor)
   @Audit()
   @Delete('4/:id')
   remove(@Param('id') id: string) {
     return this.testService.remove(id);
   }
+
+  @UseInterceptors(AuditInterceptor)
+  @Audit()
+  @Get('5/:id')
+  findOneResponse(@Param('id') id: string) {
+    //return this.testService.findOneResponse(id);
+  }
+
 }
