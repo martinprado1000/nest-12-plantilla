@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -13,7 +14,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { User } from '../users/schemas/user.schema';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto, ResponseUserDto } from '../users/dto';
-import { response } from 'express';
+import { Role } from 'src/users/enums/role.enums';
 
 @Injectable()
 export class AuthService {
@@ -22,8 +23,16 @@ export class AuthService {
     private readonly jwtService: JwtService, // Este es el modulo de jwt que interactua con el jwtModulo creado por nosotros
   ) {}
 
-  async create(createAuthDto: CreateUserDto) {
-    // Uso el CreateUserDto para crear un createAuthDto porque cuando creamos el usuario ya creamos la autenticación.
+
+  
+  // -----------REGISTER-------------------------------------------------------------------------------
+  // Uso el CreateUserDto para crear un createAuthDto porque cuando creamos el usuario ya creamos la autenticación.
+  async register(createAuthDto: CreateUserDto) {
+    if (JSON.stringify(createAuthDto.roles) !== JSON.stringify([Role.USER])) {
+      throw new BadRequestException(
+        'Operación no permitida: Solo se pueden registrar usuarios de tipo: USER',
+      );
+    }
 
     const userResponse = await this.userService.create(createAuthDto);
 
@@ -33,8 +42,9 @@ export class AuthService {
     };
   }
 
+  // -----------UPDATE------------------------------------------------------------------------------------
   async login(loginAuthDto: LoginUserDto) {
-    let userResponse: ResponseUserDto 
+    let userResponse: ResponseUserDto;
     const { password, email } = loginAuthDto;
 
     const user = await this.userService.findOne(email);
@@ -46,13 +56,14 @@ export class AuthService {
       throw new UnauthorizedException('Credential are not valid (password)');
     //delete user.password
 
-    userResponse = plainToInstance(ResponseUserDto,user,{
+    userResponse = plainToInstance(ResponseUserDto, user, {
       // Paso por el metodo ResponseUserDto para retornar el objeto editado, se lo paso como objeto plano de javaScript
       excludeExtraneousValues: true, // Excluye propiedades NO marcadas con @Expose en el response-user.dto
-    },); 
+    });
 
     // Si la registración fue correcta retornamos el usuario y el token.
-    if (user._id){ // Aunque ya se que el id existe hago la validacion para que pase la validación del tipo de dato.
+    if (user._id) {
+      // Aunque ya se que el id existe hago la validacion para que pase la validación del tipo de dato.
       return {
         ...userResponse,
         token: this.getJwtToken({ id: user._id }),
@@ -82,5 +93,4 @@ export class AuthService {
   //     );
   //   throw new InternalServerErrorException('Please check server logs');
   // }
-  
 }
